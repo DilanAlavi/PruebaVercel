@@ -1,4 +1,4 @@
-name: Desplegar a Vercel
+name: Despliegue Backend a Vercel
 
 on:
   push:
@@ -6,28 +6,38 @@ on:
       - main
 
 jobs:
-  deploy:
-    name: Desplegar a Vercel
+  deployment_vercel_Backend:
     runs-on: ubuntu-latest
-    environment: deploy
+    environment: production
+    # needs: prettier  # Asumiendo que tienes un job 'prettier' previo
+
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
     steps:
-      - name: Clonar código
-        uses: actions/checkout@v3
+      - name: "Echo values"
+        run: |
+          echo $VERCEL_PROJECT_ID
+          echo $VERCEL_ORG_ID
+          echo $VERCEL_TOKEN
 
-      - name: Configurar Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'  # Ajuste esta versión según sus necesidades
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Instalar dependencias
-        run: npm ci
+      - name: Setup Node
+        uses: actions/setup-node@v4
 
-      - name: Desplegar a Vercel
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      - name: Set Environment Variables
+        run: |
+          mkdir -p ./server
+          echo "PGHOST=${{ secrets.PGHOST }}" > ./server/.env
+          echo "PGDATABASE=${{ secrets.PGDATABASE }}" >> ./server/.env
+          echo "PGUSER=${{ secrets.PGUSER }}" >> ./server/.env
+          echo "PGPASSWORD=${{ secrets.PGPASSWORD }}" >> ./server/.env
+          echo "PGPORT=${{ secrets.PGPORT }}" >> ./server/.env
+          echo "REACT_APP_AUTH_TOKEN=${{ secrets.REACT_APP_AUTH_TOKEN }}" >> ./server/.env
 
       - name: Install Vercel CLI
         run: |
