@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Desplegar a Vercel
 
 on:
   push:
@@ -7,21 +7,23 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to Vercel
+    name: Desplegar a Vercel
     runs-on: ubuntu-latest
-    environment: deploy  # Aquí definimos el environment "deploy"
+    environment: deploy
 
     steps:
-      - name: Checkout code
+      - name: Clonar código
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: npm install
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Ajuste esta versión según sus necesidades
 
-      - name: Build project
-        run: npm run build
+      - name: Instalar dependencias
+        run: npm ci
 
-      - name: Deploy to Vercel
+      - name: Desplegar a Vercel
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
